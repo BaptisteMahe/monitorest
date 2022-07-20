@@ -1,0 +1,91 @@
+
+html {
+    height: 100vh;
+}
+
+body {
+    display: flex;
+    justify-content: space-around;
+    height: calc(100% - 20px);
+    padding: 10px;
+    margin: 0;
+    font-family: JetBrains Mono, serif;
+}
+
+.chart-header {
+    margin-left: 15px;
+}
+
+/* ------------------ CHARTS ------------------ */
+
+.global-charts {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30%;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.chart {
+    height: 15vh;
+    width: 100%;
+}
+
+.requests-charts {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* ------------------ HISTORY ------------------ */
+
+.history {
+    width: 32%;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px 12px 42px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-image: url("https://www.w3schools.com/css/searchicon.png");
+    background-position: 10px 13px;
+    background-repeat: no-repeat;
+}
+
+.history-container {
+    margin-top: 10px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    flex-grow: 1;
+    padding: 5px;
+}
+
+/* ------------------ REQUESTS CHARTS ------------------ */
+
+.requests-charts {
+    width: 32%;
+}
+
+.requests-chart-container {
+    height: calc(50% - 5px);
+}
+
+.requests-chart-container:first-child {
+    margin-bottom: 10px;
+}
+
+.requests-chart {
+    width: 100%;
+    height: calc(100% - 18px);
+}

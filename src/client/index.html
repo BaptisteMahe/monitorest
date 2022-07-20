@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Monitorest</title>
+	<script src="https://cdn.jsdelivr.net/npm/echarts@5.3.3/dist/echarts.js"></script>
+	<script src="chart-options.js" async></script>
+	<script src="general-charts.js" async></script>
+	<script src="requests-charts.js" async></script>
+	<script src="main.js" async></script>
+	<link href="styles.css" rel="stylesheet">
+</head>
+<body>
+	<div class="global-charts">
+
+		<div class="chart-container">
+			<div class="chart-header">
+				<div class="title">CPU Usage</div>
+				<div class="value" id="cpu-value"></div>
+			</div>
+			<div class="chart" id="cpu-chart"></div>
+		</div>
+
+		<div class="chart-container">
+			<div class="chart-header">
+				<div class="title">Memory Usage</div>
+				<div class="value" id="memory-value"></div>
+			</div>
+			<div class="chart" id="memory-chart"></div>
+		</div>
+
+		<div class="chart-container">
+			<div class="chart-header">
+				<div class="title">Load Average (1 min)</div>
+				<div class="value" id="load-average-value"></div>
+			</div>
+			<div class="chart" id="load-average-chart"></div>
+		</div>
+
+		<div class="chart-container">
+			<div class="chart-header">
+				<div class="title">Response Time</div>
+				<div class="value" id="response-time-value"></div>
+			</div>
+			<div class="chart" id="response-time-chart"></div>
+		</div>
+
+		<div class="chart-container">
+			<div class="chart-header">
+				<div class="title">Resquests (/sec)</div>
+				<div class="value" id="requests-value"></div>
+			</div>
+			<div class="chart" id="requests-chart"></div>
+		</div>
+
+	</div>
+
+	<div class="history">
+		<input class="search-input" placeholder="Search.."/>
+		<div class="history-container"></div>
+	</div>
+
+	<div class="requests-charts">
+
+		<div class="requests-chart-container">
+			<div class="requests-chart-title chart-header">Requests by code totals</div>
+			<div id="bar-requests-chart" class="requests-chart"></div>
+		</div>
+
+		<div class="requests-chart-container">
+			<div class="requests-chart-title chart-header">Requests by code overtime</div>
+			<div id="line-requests-chart" class="requests-chart"></div>
+		</div>
+	</div>
+</body>
+</html>
