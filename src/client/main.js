@@ -1,4 +1,4 @@
-const socket = new WebSocket("wss://www.example.com/socketserver");
+const socket = new WebSocket("ws://localhost:8080");
 const cpuValues = [];
 
 socket.onopen = event => {

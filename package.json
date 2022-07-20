@@ -2,11 +2,15 @@
   "name": "monitorest",
   "version": "1.0.0",
   "description": "A monitor for Express.js REST Api",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
+    "dev": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["REST API", "Monitoring"],
+  "keywords": [
+    "REST API",
+    "Monitoring"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BaptisteMahe/monitorest.git"
@@ -16,5 +20,9 @@
   },
   "homepage": "https://github.com/BaptisteMahe/monitorest",
   "author": "Baptiste Mahé",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "os-utils": "^0.0.14",
+    "ws": "^8.8.1"
+  }
 }
