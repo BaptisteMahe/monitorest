@@ -3,24 +3,25 @@ const cpuValues = [];
 
 socket.onopen = event => {
 	socket.onmessage = event => {
+		const payload = JSON.parse(event.data);
 
-		cpuValue.innerText = event.data.cpuValue + "%"
-		memoryValue.innerText = event.data.memoryValue + "MB"
-		loadAverageValue.innerText = event.data.loadAverageValue
-		responseTimeValue.innerText = event.data.responseTimeValue + "ms"
-		requestsValue.innerText = event.data.requestsValue
+		cpuValue.innerText = payload.cpuValue + "%"
+		memoryValue.innerText = payload.memoryValue + "MB"
+		loadAverageValue.innerText = payload.loadAverageValue
+		responseTimeValue.innerText = payload.responseTimeValue + "ms"
+		requestsValue.innerText = payload.requestsValue
 
-		cpuValues.push(event.data.cpuValue);
-		cpuChart.setOption({
-			xAxis: {
-				data: [new Date()]
-			},
-			series: [
-				{
-					name: "CPU Usage",
-					data: cpuValues
-				}
-			]
-		});
+		// cpuValues.push(event.data.cpuValue);
+		// cpuChart.setOption({
+		// 	xAxis: {
+		// 		data: [new Date()]
+		// 	},
+		// 	series: [
+		// 		{
+		// 			name: "CPU Usage",
+		// 			data: cpuValues
+		// 		}
+		// 	]
+		// });
 	}
 }
