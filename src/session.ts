@@ -1,8 +1,8 @@
-import { loadavg, totalmem } from "os-utils";
+import { freememPercentage, loadavg, totalmem } from "os-utils";
 import { WebSocket } from "ws";
 import express from "express";
 
-import { computeRequestLoad, getCpu, getDurationInMilliseconds } from "./utils";
+import { getCpu, getDurationInMilliseconds } from "./utils";
 import { Request } from "./models";
 
 export default class Session {
@@ -14,7 +14,6 @@ export default class Session {
 
 	constructor(client: WebSocket) {
 		this.thread = setInterval(() => {
-			// console.log(this.requests);
 			this.sendMessage(client);
 		}, 1000);
 
@@ -32,22 +31,21 @@ export default class Session {
 
 	async sendMessage(client: WebSocket) {
 		client.send(JSON.stringify({
-			cpuValue: (await getCpu()).toFixed(4),
-			memoryValue: totalmem(),
+			cpuValue: ((await getCpu() * 100)).toFixed(4),
+			memoryValue: Math.trunc((1 - freememPercentage()) * totalmem()),
 			loadAverageValue: loadavg(1).toFixed(4),
-			responseTimeValue: this.requests.length ? (this.requests.reduce(
-				(reducer, req) => reducer + req.responseTime,
-				0) / this.requests.length).toFixed(4) : undefined,
-			requestsValue: (computeRequestLoad(this.requests) / 1000).toFixed(4)
+			requests: this.requests
 		}));
+		this.requests = []
 	}
 
 	newRequest(req: express.Request, res: express.Response) {
 		const start = process.hrtime();
-
 		res.on('close', () => {
 			this.requests.push({
 				date: new Date().getTime(),
+				method: req.method,
+				url: req.url,
 				status: res.statusCode,
 				responseTime: getDurationInMilliseconds(start)
 			});
