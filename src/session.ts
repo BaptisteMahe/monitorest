@@ -17,23 +17,16 @@ export default class Session {
 			this.sendMessage(client);
 		}, 1000);
 
-		client.on("close", () => {
-			console.log("The client has connected");
-			this.stop();
-		});
+		client.on("close", () => this.stop());
 
-		// handling client connection error
-		client.onerror = () => {
-			console.log("Some Error occurred")
-			this.stop();
-		}
+		client.onerror = () => this.stop();
 	}
 
 	async sendMessage(client: WebSocket) {
 		client.send(JSON.stringify({
-			cpuValue: ((await getCpu() * 100)).toFixed(4),
+			cpuValue: ((await getCpu() * 100)).toFixed(2),
 			memoryValue: Math.trunc((1 - freememPercentage()) * totalmem()),
-			loadAverageValue: loadavg(1).toFixed(4),
+			loadAverageValue: loadavg(1).toFixed(2),
 			requests: this.requests
 		}));
 		this.requests = []

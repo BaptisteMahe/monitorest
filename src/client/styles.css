@@ -47,10 +47,11 @@ body {
     width: 32%;
     display: flex;
     flex-direction: column;
-
 }
 
 .search-input {
+    display: none;
+
     width: 100%;
     padding: 12px 20px 12px 42px;
     box-sizing: border-box;
@@ -68,7 +69,37 @@ body {
     border: 2px solid #ccc;
     border-radius: 4px;
     flex-grow: 1;
-    padding: 5px;
+    padding: 5px 10px 5px 5px;
+    overflow-y: auto;
+}
+
+.history-element {
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    padding: 2px;
+    margin-bottom: 2px;
+}
+
+.row {
+    display: flex;
+    font-size: 12px;
+}
+
+.res-code {
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+.success {
+    color: green;
+}
+
+.warn {
+    color: orange;
+}
+
+.error {
+    color: red;
 }
 
 /* ------------------ REQUESTS CHARTS ------------------ */

@@ -6,9 +6,10 @@ import Session from "./session";
 
 export function monitorest(app: express.Application, port: number): express.Application {
 
+	let sessions: Session[] = [];
+
 	// Socket server setup
 	const socketServer = new Server({ port });
-	const sessions: Session[] = [];
 	socketServer.on("connection", ws => {
 		console.log("new client connected");
 		sessions.push(new Session(ws));
@@ -16,6 +17,7 @@ export function monitorest(app: express.Application, port: number): express.Appl
 
 	// Request Middleware
 	app.use((req, res, next) => {
+		sessions = sessions.filter(session => session.alive);
 		sessions.forEach(session => session.newRequest(req, res));
 		next();
 	});

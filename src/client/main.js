@@ -8,11 +8,13 @@ const loadAverageValues = [];
 const responseTimeValues = [];
 const requestsValues = [];
 
-socket.onopen = event => {
+socket.onopen = _ => {
 	socket.onmessage = event => {
 		const payload = JSON.parse(event.data);
+		// console.log(payload);
 
 		requests.push(payload.requests);
+
 		cpuValues.push(payload.cpuValue);
 		memoryValues.push(payload.memoryValue);
 		loadAverageValues.push(payload.loadAverageValue);
@@ -22,9 +24,9 @@ socket.onopen = event => {
 		cpuValue.innerText = payload.cpuValue + "%";
 		memoryValue.innerText = payload.memoryValue + "MB";
 		loadAverageValue.innerText = payload.loadAverageValue;
-		responseTimeValue.innerText = responseTimeValues[responseTimeValues.length - 1].toFixed(4) + "ms";
-		requestsValue.innerText = requestsValues[responseTimeValues.length - 1].toFixed(4);
+		responseTimeValue.innerText = responseTimeValues[responseTimeValues.length - 1].toFixed(2) + "ms";
+		requestsValue.innerText = requestsValues[responseTimeValues.length - 1].toFixed(2);
 
-
+		payload.requests.forEach(addToHistory);
 	}
 }
