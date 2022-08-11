@@ -22,7 +22,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 30%;
+    width: 34%;
 }
 
 .chart-header {

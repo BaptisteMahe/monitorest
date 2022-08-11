@@ -1,43 +1,48 @@
 const lineOption = {
 	grid: {
-		left: 15,
+		left: 27,
 		top: 5,
-		right: 16,
+		right: 22,
 		bottom: 20
 	},
 	xAxis: {
-
+		type: 'category',
+		boundaryGap: false,
+		axisLabel: {
+			interval: 10,
+			showMinLabel: true,
+			showMaxLabel: true,
+			fontSize: 10
+		}
 	},
 	yAxis: {
-		type: 'value'
+		type: 'value',
+		boundaryGap: [0, '50%']
 	},
-	series: [
-		{
-			name: 'sales',
-			type: 'line',
-			showSymbol: false,
-		}
-	]
+	tooltip: {
+		trigger: 'axis'
+	}
 };
 
 const barOption = {
 	grid: {
-		left: 15,
+		left: 25,
 		top: 5,
 		right: 16,
 		bottom: 20
 	},
 	xAxis: {
-
+		type: 'category',
+		data: ['2**', '3**', '5**']
 	},
 	yAxis: {
 		type: 'value'
 	},
 	series: [
 		{
-			name: 'sales',
+			name: 'main',
 			type: 'bar',
-			showSymbol: false,
+			showSymbol: false
 		}
 	]
 };

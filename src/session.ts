@@ -1,4 +1,4 @@
-import { freememPercentage, loadavg, totalmem } from "os-utils";
+import { freememPercentage, loadavg } from "os-utils";
 import { WebSocket } from "ws";
 import express from "express";
 
@@ -24,9 +24,10 @@ export default class Session {
 
 	async sendMessage(client: WebSocket) {
 		client.send(JSON.stringify({
-			cpuValue: ((await getCpu() * 100)).toFixed(2),
-			memoryValue: Math.trunc((1 - freememPercentage()) * totalmem()),
-			loadAverageValue: loadavg(1).toFixed(2),
+			date: new Date().getTime(),
+			cpuValue: Number(((await getCpu() * 100)).toFixed(2)),
+			memoryValue: Number(((1 - freememPercentage()) * 100).toFixed(2)),
+			loadAverageValue: Number(loadavg(1).toFixed(2)),
 			requests: this.requests
 		}));
 		this.requests = []
