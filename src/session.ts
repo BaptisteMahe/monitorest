@@ -8,21 +8,29 @@ import { Request } from "./models";
 export default class Session {
 
 	alive: boolean = true;
+	authenticated = false;
+	token: string;
 	thread?: NodeJS.Timer;
 
 	requests: Request[] = [];
 
-	constructor(client: WebSocket) {
+	constructor(client: WebSocket, token: string) {
+		this.token = token;
 		this.thread = setInterval(() => {
 			this.sendMessage(client);
 		}, 1000);
 
 		client.on("close", () => this.stop());
 
+		client.onmessage = event => {
+			if (event.data === token) this.authenticated = true;
+		}
+
 		client.onerror = () => this.stop();
 	}
 
 	async sendMessage(client: WebSocket) {
+		if (!this.authenticated) return;
 		client.send(JSON.stringify({
 			date: new Date().getTime(),
 			cpuValue: Number(((await getCpu() * 100)).toFixed(2)),

@@ -1,3 +1,3 @@
 # Monitorest
 
-## An Express.js application monitor.
+## A lightweight monitor for express apps using Apache ECharts and WebSockets.

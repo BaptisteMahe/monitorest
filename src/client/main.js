@@ -2,8 +2,7 @@
 
 const CHART_TIME_WIDTH = 50;
 
-const wsUrl = 'ws://localhost:8080';
-console.log(location.protocol + '//' + location.hostname + ':' + location.port)
+const wsUrl = 'ws://' + location.hostname + ':' + port;
 
 function connect() {
 	let charts;
@@ -37,6 +36,8 @@ function connect() {
 			search = document.getElementById('search-input').value;
 			loadHistory(requests, search);
 		}
+
+		socket.send(token);
 
 		socket.onmessage = event => {
 			const payload = JSON.parse(event.data);

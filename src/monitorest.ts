@@ -3,6 +3,7 @@ import { Server } from "ws";
 import express from "express";
 import fs from "fs";
 import Handlebars from "handlebars";
+import * as crypto from "crypto";
 
 import Session from "./session";
 import { Config } from "./models";
@@ -10,12 +11,13 @@ import { Config } from "./models";
 export function monitorest(app: express.Application, config: Config): express.Application {
 
 	let sessions: Session[] = [];
+	let serverToken = crypto.randomUUID();
 
 	// Socket server setup
 	const socketServer = new Server({ port: config.port });
 	socketServer.on("connection", ws => {
 		console.log("new client connected");
-		sessions.push(new Session(ws));
+		sessions.push(new Session(ws, serverToken));
 	});
 
 	// Request Middleware
@@ -30,7 +32,9 @@ export function monitorest(app: express.Application, config: Config): express.Ap
 	const context = {
 		styles: fs.readFileSync(path.join(__dirname, "/client/styles.css")),
 		main: fs.readFileSync(path.join(__dirname, "/client/main.js")),
-		utils: fs.readFileSync(path.join(__dirname, "/client/utils.js"))
+		utils: fs.readFileSync(path.join(__dirname, "/client/utils.js")),
+		port: config.port,
+		token: `"${serverToken}"`
 	}
 	app.get("/monitorest", (req, res, next) => {
 		res.send(render(context));
