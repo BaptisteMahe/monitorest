@@ -5,3 +5,7 @@ export type Request = {
 	status: number;
 	responseTime: number;
 };
+
+export type Config = {
+	port: number;
+};

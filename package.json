@@ -4,7 +4,7 @@
   "description": "A monitor for Express.js REST Api",
   "main": "index.ts",
   "scripts": {
-    "test": "npx nodemon --ext js,ts test/app.ts",
+    "example": "npx nodemon --ext js,ts examples/app.ts",
     "build": "npx tsc"
   },
   "keywords": [
@@ -23,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.1",
+    "handlebars": "^4.7.7",
     "os-utils": "^0.0.14",
     "ws": "^8.8.1"
   },

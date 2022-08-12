@@ -1,6 +1,9 @@
+'use strict';
+
 const CHART_TIME_WIDTH = 50;
 
 const wsUrl = 'ws://localhost:8080';
+console.log(location.protocol + '//' + location.hostname + ':' + location.port)
 
 function connect() {
 	let charts;
