@@ -50,8 +50,6 @@ body {
 }
 
 .search-input {
-    display: none;
-
     width: 100%;
     padding: 12px 20px 12px 42px;
     box-sizing: border-box;

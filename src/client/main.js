@@ -1,76 +1,10 @@
-class GeneralChart {
-
-	name;
-	chart;
-	valueDisplay;
-	suffix;
-	data = [];
-
-	constructor(name, chartElemId, valueDisplayElemId, suffix = "") {
-		this.name = name;
-		this.chart = echarts.init(document.getElementById(chartElemId));
-		this.chart.setOption({
-			grid: {
-				left: 27,
-				top: 5,
-				right: 22,
-				bottom: 20
-			},
-			xAxis: {
-				type: 'category',
-				boundaryGap: false,
-				axisLabel: {
-					interval: 10,
-					showMinLabel: true,
-					showMaxLabel: true,
-					fontSize: 10
-				}
-			},
-			yAxis: {
-				type: 'value',
-				boundaryGap: [0, '50%']
-			},
-			tooltip: {
-				trigger: 'axis'
-			}
-		});
-		this.valueDisplay = document.getElementById(valueDisplayElemId);
-		this.suffix = suffix;
-	}
-
-	onData(newData, dates) {
-		this.data.push(newData)
-		this.valueDisplay.innerText = newData.toFixed(2) + this.suffix;
-		if (this.data.length > CHART_TIME_WIDTH) this.data.shift();
-		this.chart.setOption({
-			xAxis: { data: dates },
-			series: [
-				{
-					name: this.name,
-					type: 'line',
-					showSymbol: false,
-					areaStyle: {},
-					data: this.data
-				}
-			]
-		});
-	}
-
-	resize() {
-		this.chart.resize();
-	}
-
-	dispose() {
-		this.chart.dispose()
-	}
-}
-
 const CHART_TIME_WIDTH = 50;
 
 const wsUrl = 'ws://localhost:8080';
 
 function connect() {
 	let charts;
+	let search;
 
 	const socket = new WebSocket(wsUrl);
 
@@ -96,6 +30,11 @@ function connect() {
 		charts = [ cpuChart, memoryChart, loadAverageChart, responseTimeChart, requestsChart, barRequestsChart, lineRequestsChart ];
 		window.onresize = () => charts.forEach(chart => chart.resize());
 
+		window.onkeyup = _ => {
+			search = document.getElementById('search-input').value;
+			loadHistory(requests, search);
+		}
+
 		socket.onmessage = event => {
 			const payload = JSON.parse(event.data);
 
@@ -114,7 +53,7 @@ function connect() {
 
 			/* ------------------ HISTORY ------------------ */
 
-			payload.requests.forEach(addToHistory);
+			loadHistory(requests, search);
 
 			/* ------------------ REQUESTS CHARTS ------------------ */
 
@@ -178,7 +117,7 @@ function connect() {
 					boundaryGap: false,
 					data: messageDates,
 					axisLabel: {
-						interval: 10,
+						interval: 11,
 						showMinLabel: true,
 						showMaxLabel: true,
 						fontSize: 10
@@ -218,7 +157,7 @@ function connect() {
 
 	socket.onclose = event => {
 		console.log('Socket is closed. Reconnect will be attempted in 1 second.', event.reason);
-		charts.forEach(chart => chart.dispose());
+		charts?.forEach(chart => chart.dispose());
 		setTimeout(() => connect(), 1000);
 	};
 
@@ -226,6 +165,73 @@ function connect() {
 		console.error('Socket encountered error: ', err.message, 'Closing socket');
 		socket.close();
 	};
+}
+
+class GeneralChart {
+	name;
+	chart;
+	data = [];
+
+	valueDisplay;
+	suffix;
+
+	constructor(name, chartElemId, valueDisplayElemId, suffix = "") {
+		this.name = name;
+		this.chart = echarts.init(document.getElementById(chartElemId));
+		this.chart.setOption({
+			grid: {
+				left: 27,
+				top: 5,
+				right: 22,
+				bottom: 20
+			},
+			xAxis: {
+				type: 'category',
+				boundaryGap: false,
+				axisLabel: {
+					interval: 11,
+					showMinLabel: true,
+					showMaxLabel: true,
+					fontSize: 10
+				}
+			},
+			yAxis: {
+				type: 'value',
+				boundaryGap: [0, '50%']
+			},
+			tooltip: {
+				trigger: 'axis'
+			}
+		});
+		this.valueDisplay = document.getElementById(valueDisplayElemId);
+		this.suffix = suffix;
+	}
+
+	onData(newData, dates) {
+		this.data.push(newData)
+		this.valueDisplay.innerText = newData.toFixed(2) + this.suffix;
+		if (this.data.length > CHART_TIME_WIDTH) this.data.shift();
+		this.chart.setOption({
+			xAxis: { data: dates },
+			series: [
+				{
+					name: this.name,
+					type: 'line',
+					showSymbol: false,
+					areaStyle: {},
+					data: this.data
+				}
+			]
+		});
+	}
+
+	resize() {
+		this.chart.resize();
+	}
+
+	dispose() {
+		this.chart.dispose()
+	}
 }
 
 connect();

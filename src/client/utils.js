@@ -10,9 +10,12 @@ function computeResponseTime(requests) {
 		0) / requests.length : 0
 }
 
-function addToHistory(request) {
+function loadHistory(requests, search) {
 	const container = document.querySelector("#history-container");
-	container.innerHTML = getHistoryElement(request) + container.innerHTML;
+	container.innerHTML = "";
+	for (let request of requests)
+		if (isRequestMatching(request, search))
+			container.innerHTML = getHistoryElement(request) + container.innerHTML;
 }
 
 function getHistoryElement(request) {
@@ -27,10 +30,11 @@ function getHistoryElement(request) {
 	`;
 }
 
-function isRequestMatching(request, string) {
-	return `${formatMillisec(request.date)} ${request.method} ${request.url}`.includes(string)
-		|| request.status.toString().includes(string)
-		|| `${request.responseTime.toFixed(1)}ms`.includes(string);
+function isRequestMatching(request, search) {
+	if (!search?.length) return true;
+	return `${formatMillisec(request.date)} ${request.method} ${request.url}`.includes(search)
+		|| request.status.toString().includes(search)
+		|| `${request.responseTime.toFixed(1)}ms`.includes(search);
 }
 
 function getStatusClass(status) {
