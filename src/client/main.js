@@ -8,7 +8,6 @@ let search;
 const socket = io();
 
 socket.on("connect", () => {
-	console.log("connect");
 	let requests = [];
 
 	const succeedRequestsNum = [];

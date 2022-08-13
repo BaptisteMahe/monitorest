@@ -9,6 +9,9 @@ export type Request = {
 };
 
 export type Config = {
-	port: number;
-	socket: Socket;
+	socket?: Socket;
+	auth?: {
+		username: string;
+		password: string;
+	}
 };

@@ -4,11 +4,15 @@ import { Server } from "socket.io";
 import fs from "fs";
 import Handlebars from "handlebars";
 import * as crypto from "crypto";
+import basicAuth from "express-basic-auth";
 
 import Session from "./session";
 import { Config } from "./models";
+import { validateConfig } from "./utils";
 
 export function monitorest(app: express.Application, config?: Config): express.Application {
+
+	if (config) validateConfig(config);
 
 	let sessions: Session[] = [];
 	let token = crypto.randomUUID();
@@ -39,11 +43,20 @@ export function monitorest(app: express.Application, config?: Config): express.A
 		styles: fs.readFileSync(path.join(__dirname, "/client/styles.css")),
 		main: fs.readFileSync(path.join(__dirname, "/client/main.js")),
 		utils: fs.readFileSync(path.join(__dirname, "/client/utils.js")),
-		token: `"${token}"`
+		token: `"${token}"`,
+		// TODO: remove (trick for offline coding)
+		echarts: fs.readFileSync(path.join(__dirname, "../tmp/echarts.js")),
+		io: fs.readFileSync(path.join(__dirname, "../tmp/socket.io.js"))
 	}
-	app.get("/monitorest", (req, res, next) => {
-		res.send(render(context));
-	});
+	app.get(
+		"/monitorest",
+		config?.auth ?
+			basicAuth({ users: { [config.auth.username]: config.auth.password }, challenge: true })
+			: (req, res, next) => next(),
+		(req, res, next) => {
+			res.send(render(context));
+		}
+	);
 
 	return app;
 }
