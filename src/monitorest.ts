@@ -1,6 +1,6 @@
 import * as path from "path";
-import { Server } from "ws";
 import express from "express";
+import { Server } from "socket.io";
 import fs from "fs";
 import Handlebars from "handlebars";
 import * as crypto from "crypto";
@@ -8,20 +8,26 @@ import * as crypto from "crypto";
 import Session from "./session";
 import { Config } from "./models";
 
-export function monitorest(app: express.Application, config: Config): express.Application {
+export function monitorest(app: express.Application, config?: Config): express.Application {
 
 	let sessions: Session[] = [];
-	let serverToken = crypto.randomUUID();
+	let token = crypto.randomUUID();
 
-	// Socket server setup
-	const socketServer = new Server({ port: config.port });
-	socketServer.on("connection", ws => {
-		console.log("new client connected");
-		sessions.push(new Session(ws, serverToken));
-	});
+	let socketServer: Server;
+	if (config?.socket) socketServer = new Server((config.socket as any).server);
 
 	// Request Middleware
 	app.use((req, res, next) => {
+		// Socket server setup
+		if (socketServer === undefined) {
+			socketServer = new Server((req.socket as any).server);
+
+			socketServer.on("connection", socket => {
+				console.log("new client connected");
+				sessions.push(new Session(socket, token));
+			});
+		}
+
 		sessions = sessions.filter(session => session.alive);
 		sessions.forEach(session => session.newRequest(req, res));
 		next();
@@ -33,8 +39,7 @@ export function monitorest(app: express.Application, config: Config): express.Ap
 		styles: fs.readFileSync(path.join(__dirname, "/client/styles.css")),
 		main: fs.readFileSync(path.join(__dirname, "/client/main.js")),
 		utils: fs.readFileSync(path.join(__dirname, "/client/utils.js")),
-		port: config.port,
-		token: `"${serverToken}"`
+		token: `"${token}"`
 	}
 	app.get("/monitorest", (req, res, next) => {
 		res.send(render(context));

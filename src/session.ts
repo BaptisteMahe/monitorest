@@ -1,11 +1,13 @@
 import { freememPercentage, loadavg } from "os-utils";
-import { WebSocket } from "ws";
+import { Socket } from "socket.io";
 import express from "express";
 
 import { getCpu, getDurationInMilliseconds } from "./utils";
 import { Request } from "./models";
 
 export default class Session {
+
+	client: Socket;
 
 	alive: boolean = true;
 	authenticated = false;
@@ -14,30 +16,32 @@ export default class Session {
 
 	requests: Request[] = [];
 
-	constructor(client: WebSocket, token: string) {
+	constructor(client: Socket, token: string) {
+		this.client = client;
 		this.token = token;
 		this.thread = setInterval(() => {
 			this.sendMessage(client);
 		}, 1000);
 
-		client.on("close", () => this.stop());
+		this.client.on("disconnect", () => this.stop());
 
-		client.onmessage = event => {
-			if (event.data === token) this.authenticated = true;
-		}
+		this.client.on("auth", auth => {
+			if (auth === token) this.authenticated = true;
+			else this.client.disconnect(true);
+		});
 
-		client.onerror = () => this.stop();
+		this.client.on("error", () => this.stop());
 	}
 
-	async sendMessage(client: WebSocket) {
+	async sendMessage(client: Socket) {
 		if (!this.authenticated) return;
-		client.send(JSON.stringify({
+		client.emit("update", {
 			date: new Date().getTime(),
 			cpuValue: Number(((await getCpu() * 100)).toFixed(2)),
 			memoryValue: Number(((1 - freememPercentage()) * 100).toFixed(2)),
 			loadAverageValue: Number(loadavg(1).toFixed(2)),
 			requests: this.requests
-		}));
+		});
 		this.requests = []
 	}
 

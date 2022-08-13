@@ -1,13 +1,13 @@
 function computeRequestLoad(requests) {
 	if ([0, 1].includes(requests.length)) return 0;
 	const totalTime = requests[requests.length -1].date - requests[0].date;
-	return requests.length / totalTime;
+	return Number((requests.length / totalTime).toFixed(2));
 }
 
 function computeResponseTime(requests) {
-	return requests.length ? requests.reduce(
+	return requests.length ? Number((requests.reduce(
 		(reducer, req) => reducer + req.responseTime,
-		0) / requests.length : 0
+		0) / requests.length).toFixed(2)) : 0
 }
 
 function loadHistory(requests, search) {

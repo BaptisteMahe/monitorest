@@ -2,174 +2,167 @@
 
 const CHART_TIME_WIDTH = 50;
 
-const wsUrl = 'ws://' + location.hostname + ':' + port;
+let charts;
+let search;
 
-function connect() {
-	let charts;
-	let search;
+const socket = io();
 
-	const socket = new WebSocket(wsUrl);
+socket.on("connect", () => {
+	console.log("connect");
+	let requests = [];
 
-	socket.onopen = _ => {
+	const succeedRequestsNum = [];
+	const warnedRequestsNum = [];
+	const failedRequestsNum = [];
 
-		let requests = [];
+	const messageDates = [];
 
-		const succeedRequestsNum = [];
-		const warnedRequestsNum = [];
-		const failedRequestsNum = [];
+	const cpuChart = new GeneralChart('Cpu', 'cpu-chart', 'cpu-value', '%');
+	const memoryChart = new GeneralChart('Memory usage', 'memory-chart', 'memory-value', '%');
+	const loadAverageChart = new GeneralChart('Load average', 'load-average-chart', 'load-average-value');
+	const responseTimeChart = new GeneralChart('Response time', 'response-time-chart', 'response-time-value', 'ms');
+	const requestsChart = new GeneralChart('Request load', 'requests-chart', 'requests-value');
 
-		const messageDates = [];
+	const barRequestsChart = echarts.init(document.getElementById('bar-requests-chart'));
+	const lineRequestsChart = echarts.init(document.getElementById('line-requests-chart'));
 
-		const cpuChart = new GeneralChart('Cpu', 'cpu-chart', 'cpu-value', '%');
-		const memoryChart = new GeneralChart('Memory usage', 'memory-chart', 'memory-value', '%');
-		const loadAverageChart = new GeneralChart('Load average', 'load-average-chart', 'load-average-value');
-		const responseTimeChart = new GeneralChart('Response time', 'response-time-chart', 'response-time-value', 'ms');
-		const requestsChart = new GeneralChart('Request load', 'requests-chart', 'requests-value');
+	charts = [cpuChart, memoryChart, loadAverageChart, responseTimeChart, requestsChart, barRequestsChart, lineRequestsChart];
+	window.onresize = () => charts.forEach(chart => chart.resize());
 
-		const barRequestsChart = echarts.init(document.getElementById('bar-requests-chart'));
-		const lineRequestsChart = echarts.init(document.getElementById('line-requests-chart'));
-
-		charts = [ cpuChart, memoryChart, loadAverageChart, responseTimeChart, requestsChart, barRequestsChart, lineRequestsChart ];
-		window.onresize = () => charts.forEach(chart => chart.resize());
-
-		window.onkeyup = _ => {
-			search = document.getElementById('search-input').value;
-			loadHistory(requests, search);
-		}
-
-		socket.send(token);
-
-		socket.onmessage = event => {
-			const payload = JSON.parse(event.data);
-
-			requests = requests.concat(payload.requests);
-
-			/* ------------------ CHARTS ------------------ */
-
-			messageDates.push(new Date(payload.date).toISOString().slice(11, 19));
-			if (messageDates.length > CHART_TIME_WIDTH) messageDates.shift();
-
-			cpuChart.onData(payload.cpuValue, messageDates);
-			memoryChart.onData(payload.memoryValue, messageDates);
-			loadAverageChart.onData(payload.loadAverageValue, messageDates);
-			responseTimeChart.onData(computeResponseTime(payload.requests), messageDates);
-			requestsChart.onData(computeRequestLoad(payload.requests) * 1000, messageDates);
-
-			/* ------------------ HISTORY ------------------ */
-
-			loadHistory(requests, search);
-
-			/* ------------------ REQUESTS CHARTS ------------------ */
-
-			barRequestsChart.setOption({
-				grid: {
-					left: 25,
-					top: 5,
-					right: 16,
-					bottom: 20
-				},
-				xAxis: {
-					type: 'category',
-					data: ['2**', '3**', '5**']
-				},
-				yAxis: {
-					type: 'value'
-				},
-				series: [
-					{
-						name: 'main',
-						type: 'bar',
-						data: [
-							{
-								value: requests.filter(request => request.status.toString().startsWith("2")).length,
-								itemStyle: {color: 'green'}
-							},
-							{
-								value: requests.filter(request => request.status.toString().startsWith("3")).length,
-								itemStyle: {color: 'orange'}
-							},
-							{
-								value: requests.filter(
-									request => request.status.toString().startsWith("4") || request.status.toString().startsWith("5")
-								).length,
-								itemStyle: {color: 'red'}
-							}
-						]
-					}
-				]
-			});
-
-			succeedRequestsNum.push(payload.requests.filter(request => request.status.toString().startsWith("2")).length);
-			if (succeedRequestsNum.length > CHART_TIME_WIDTH) succeedRequestsNum.shift();
-			warnedRequestsNum.push(payload.requests.filter(request => request.status.toString().startsWith("3")).length);
-			if (warnedRequestsNum.length > CHART_TIME_WIDTH) warnedRequestsNum.shift();
-			failedRequestsNum.push(payload.requests.filter(
-					request => request.status.toString().startsWith("4") || request.status.toString().startsWith("5")
-				).length
-			);
-			if (failedRequestsNum.length > CHART_TIME_WIDTH) failedRequestsNum.shift();
-
-			lineRequestsChart.setOption({
-				grid: {
-					left: 27,
-					top: 5,
-					right: 22,
-					bottom: 20
-				},
-				xAxis: {
-					type: 'category',
-					boundaryGap: false,
-					data: messageDates,
-					axisLabel: {
-						interval: 11,
-						showMinLabel: true,
-						showMaxLabel: true,
-						fontSize: 10
-					}
-				},
-				yAxis: {
-					type: 'value',
-					boundaryGap: [0, '50%']
-				},
-				tooltip: {
-					trigger: 'axis'
-				},
-				series: [
-					{
-						name: 'success',
-						type: 'line',
-						showSymbol: false,
-						data: succeedRequestsNum
-					},
-					{
-						name: 'warning',
-						type: 'line',
-						showSymbol: false,
-						data: warnedRequestsNum
-					},
-					{
-						name: 'error',
-						type: 'line',
-						showSymbol: false,
-						data: failedRequestsNum
-					},
-				],
-				color: ['green', 'orange', 'red']
-			});
-		}
+	window.onkeyup = _ => {
+		search = document.getElementById('search-input').value;
+		loadHistory(requests, search);
 	}
 
-	socket.onclose = event => {
-		console.log('Socket is closed. Reconnect will be attempted in 1 second.', event.reason);
-		charts?.forEach(chart => chart.dispose());
-		setTimeout(() => connect(), 1000);
-	};
+	socket.emit("auth", token);
 
-	socket.onerror = err => {
-		console.error('Socket encountered error: ', err.message, 'Closing socket');
-		socket.close();
-	};
-}
+	socket.on("update", payload => {
+		requests = requests.concat(payload.requests);
+
+		/* ------------------ CHARTS ------------------ */
+
+		messageDates.push(new Date(payload.date).toISOString().slice(11, 19));
+		if (messageDates.length > CHART_TIME_WIDTH) messageDates.shift();
+
+		cpuChart.onData(payload.cpuValue, messageDates);
+		memoryChart.onData(payload.memoryValue, messageDates);
+		loadAverageChart.onData(payload.loadAverageValue, messageDates);
+		responseTimeChart.onData(computeResponseTime(payload.requests), messageDates);
+		requestsChart.onData(computeRequestLoad(payload.requests) * 1000, messageDates);
+
+		/* ------------------ HISTORY ------------------ */
+
+		loadHistory(requests, search);
+
+		/* ------------------ REQUESTS CHARTS ------------------ */
+
+		barRequestsChart.setOption({
+			grid: {
+				left: 25,
+				top: 5,
+				right: 16,
+				bottom: 20
+			},
+			xAxis: {
+				type: 'category',
+				data: ['2**', '3**', '5**']
+			},
+			yAxis: {
+				type: 'value'
+			},
+			series: [
+				{
+					name: 'main',
+					type: 'bar',
+					data: [
+						{
+							value: requests.filter(request => request.status.toString().startsWith("2")).length,
+							itemStyle: {color: 'green'}
+						},
+						{
+							value: requests.filter(request => request.status.toString().startsWith("3")).length,
+							itemStyle: {color: 'orange'}
+						},
+						{
+							value: requests.filter(
+								request => request.status.toString().startsWith("4") || request.status.toString().startsWith("5")
+							).length,
+							itemStyle: {color: 'red'}
+						}
+					]
+				}
+			]
+		});
+
+		succeedRequestsNum.push(payload.requests.filter(request => request.status.toString().startsWith("2")).length);
+		if (succeedRequestsNum.length > CHART_TIME_WIDTH) succeedRequestsNum.shift();
+		warnedRequestsNum.push(payload.requests.filter(request => request.status.toString().startsWith("3")).length);
+		if (warnedRequestsNum.length > CHART_TIME_WIDTH) warnedRequestsNum.shift();
+		failedRequestsNum.push(payload.requests.filter(
+				request => request.status.toString().startsWith("4") || request.status.toString().startsWith("5")
+			).length
+		);
+		if (failedRequestsNum.length > CHART_TIME_WIDTH) failedRequestsNum.shift();
+
+		lineRequestsChart.setOption({
+			grid: {
+				left: 27,
+				top: 5,
+				right: 22,
+				bottom: 20
+			},
+			xAxis: {
+				type: 'category',
+				boundaryGap: false,
+				data: messageDates,
+				axisLabel: {
+					interval: 11,
+					showMinLabel: true,
+					showMaxLabel: true,
+					fontSize: 10
+				}
+			},
+			yAxis: {
+				type: 'value',
+				boundaryGap: [0, '50%']
+			},
+			tooltip: {
+				trigger: 'axis'
+			},
+			series: [
+				{
+					name: 'success',
+					type: 'line',
+					showSymbol: false,
+					data: succeedRequestsNum
+				},
+				{
+					name: 'warning',
+					type: 'line',
+					showSymbol: false,
+					data: warnedRequestsNum
+				},
+				{
+					name: 'error',
+					type: 'line',
+					showSymbol: false,
+					data: failedRequestsNum
+				},
+			],
+			color: ['green', 'orange', 'red']
+		});
+	});
+});
+
+socket.on("disconnect", _ => {
+	console.log("disconnect");
+	charts?.forEach(chart => chart.dispose());
+});
+
+socket.on("error", err => {
+	charts?.forEach(chart => chart.dispose());
+	console.error('Socket encountered error: ', err.message, 'Closing socket');
+});
 
 class GeneralChart {
 	name;
@@ -204,7 +197,8 @@ class GeneralChart {
 				boundaryGap: [0, '50%']
 			},
 			tooltip: {
-				trigger: 'axis'
+				trigger: 'axis',
+				valueFormatter: value => value + suffix
 			}
 		});
 		this.valueDisplay = document.getElementById(valueDisplayElemId);
@@ -222,7 +216,7 @@ class GeneralChart {
 					name: this.name,
 					type: 'line',
 					showSymbol: false,
-					areaStyle: {},
+					areaStyle: { },
 					data: this.data
 				}
 			]
@@ -237,5 +231,3 @@ class GeneralChart {
 		this.chart.dispose()
 	}
 }
-
-connect();

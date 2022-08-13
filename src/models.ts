@@ -1,3 +1,5 @@
+import { Socket } from "socket.io";
+
 export type Request = {
 	date: number;
 	method: string;
@@ -8,4 +10,5 @@ export type Request = {
 
 export type Config = {
 	port: number;
+	socket: Socket;
 };

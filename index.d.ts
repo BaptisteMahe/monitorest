@@ -1,3 +1,5 @@
 import express from "express";
 
-export function monitorest(app: express.Application, port: number): express.Application;
+import { Config } from "./src/models";
+
+export function monitorest(app: express.Application, config?: Config): express.Application;
