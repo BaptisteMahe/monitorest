@@ -43,10 +43,7 @@ export function monitorest(app: express.Application, config?: Config): express.A
 		styles: fs.readFileSync(path.join(__dirname, "/client/styles.css")),
 		main: fs.readFileSync(path.join(__dirname, "/client/main.js")),
 		utils: fs.readFileSync(path.join(__dirname, "/client/utils.js")),
-		token: `"${token}"`,
-		// TODO: remove (trick for offline coding)
-		echarts: fs.readFileSync(path.join(__dirname, "../tmp/echarts.js")),
-		io: fs.readFileSync(path.join(__dirname, "../tmp/socket.io.js"))
+		token: `"${token}"`
 	}
 	app.get(
 		"/monitorest",
