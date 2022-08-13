@@ -64,7 +64,7 @@ socket.on("connect", () => {
 			},
 			xAxis: {
 				type: 'category',
-				data: ['2**', '3**', '5**']
+				data: ['2**', '3**', '4**, 5**']
 			},
 			yAxis: {
 				type: 'value'
