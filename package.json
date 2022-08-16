@@ -2,10 +2,11 @@
   "name": "monitorest",
   "version": "1.0.0",
   "description": "A monitor for Express.js REST Api",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "example": "npx nodemon --ext js,ts examples/app.ts",
-    "build": "npx tsc"
+    "build": "tsc"
   },
   "keywords": [
     "REST API",
