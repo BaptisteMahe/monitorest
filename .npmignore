@@ -1,4 +1,10 @@
-examples
+.idea/
+
+node_modules/
+
+examples/
+
+tmp/
 
 .gitignore
 
