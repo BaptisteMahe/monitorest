@@ -10,7 +10,9 @@
     "outDir": "dist",
   },
   "exclude": [
-    "examples"
+    "examples",
+    "node_modules",
+    "dist"
   ],
   "include": [
     "index.ts",

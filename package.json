@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "example": "npx nodemon --ext js,ts examples/app.ts",
-    "build": "tsc"
+    "build": "tsc ; cp -r src/client dist/src"
   },
   "keywords": [
     "REST API",

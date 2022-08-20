@@ -4,7 +4,7 @@
 
 Inspired by [express-status-monitor](https://www.npmjs.com/package/express-status-monitor)
 
-[![monitorest client]()]
+![monitorest client](https://baptistemahe.github.io/static/images/monitorest.png)
 
 ## Installation
 
