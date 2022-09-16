@@ -1,6 +1,6 @@
 {
   "name": "monitorest",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A monitor for Express.js REST Api",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

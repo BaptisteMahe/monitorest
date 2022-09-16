@@ -17,8 +17,10 @@ export function getDurationInMilliseconds(start: [ number, number ]): number {
 export function validateConfig(config: Config) {
 	if (!config.auth)
 		console.warn("Monitorest as no auth, the monitoring route may be unprotected.");
-	if (config.auth && (!config.auth.username || !config.auth.password))
-		throw new Error("Auth config require username and password.");
+	if (config.auth && (!config.auth.username || !config.auth.password)) {
+		console.warn("Monitorest's auth isn't complete, the monitoring route may be unprotected.");
+		config.auth = undefined;
+	}
 	if (config.socket && !Socket.prototype.isPrototypeOf(config.socket))
 		throw new Error("Wrong soket passed.")
 }
