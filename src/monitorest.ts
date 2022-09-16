@@ -27,7 +27,6 @@ export function monitorest(app: express.Application, config?: Config): express.A
 			socketServer = new Server((req.socket as any).server);
 
 			socketServer.on("connection", socket => {
-				console.log("new client connected");
 				sessions.push(new Session(socket, token));
 			});
 		}

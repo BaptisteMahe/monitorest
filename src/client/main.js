@@ -154,7 +154,7 @@ socket.on("connect", () => {
 });
 
 socket.on("disconnect", _ => {
-	console.log("disconnect");
+	console.log("disconnected");
 	charts?.forEach(chart => chart.dispose());
 });
 
